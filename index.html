@@ -175,7 +175,7 @@ form.addEventListener('submit', async (e) => {
 
   const fd = new FormData(form);
   try {
-    const res = await fetch('https://YOUR_BACKEND_URL/api/submit', {
+    const res = await fetch("https://avalonic-backend.onrender.com/api/submit", {
       method: 'POST',
       body: fd
     });
