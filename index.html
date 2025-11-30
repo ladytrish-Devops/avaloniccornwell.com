@@ -1,196 +1,284 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Avalonic Cornwell Funding — Business Financing Solutions</title>
-<meta name="description" content="We help businesses secure bank funding: working capital, term loans, invoice financing and more. Fast reviews, bank-grade confidentiality." />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --navy:#0b2545;
-    --deep:#071733;
-    --accent:#d4a953; /* gold */
-    --muted:#6b7280;
-    --bg:#fbfdff;
-    --card:#ffffff;
-    --radius:14px;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;color:var(--navy);background:linear-gradient(180deg,var(--bg),#f7fbff);-webkit-font-smoothing:antialiased}
-  header{display:flex;align-items:center;justify-content:space-between;padding:22px 28px}
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--navy),#0d3b6a);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:18px}
-  nav{display:flex;gap:18px;align-items:center}
-  nav a{color:var(--navy);text-decoration:none;font-weight:600}
-  .hero{display:grid;grid-template-columns:1fr;gap:22px;padding:48px 28px;max-width:1200px;margin:0 auto}
-  .hero-inner{background:var(--card);border-radius:18px;padding:32px;box-shadow:0 10px 30px rgba(11,37,69,0.06);display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:center}
-  .eyebrow{color:var(--accent);font-weight:700}
-  h1{font-size:28px;margin:8px 0 6px;line-height:1.06}
-  p.lead{color:var(--muted);margin:0 0 18px}
-  .cta-row{display:flex;gap:12px}
-  .btn{padding:12px 18px;border-radius:10px;border:0;cursor:pointer;font-weight:700}
-  .btn-primary{background:linear-gradient(90deg,var(--navy),#144070);color:white}
-  .btn-ghost{background:transparent;border:2px solid rgba(11,37,69,0.08);color:var(--navy)}
-  /* form card */
-  form.card{background:linear-gradient(180deg,#fff,#fbfdff);padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(11,37,69,0.04)}
-  .field{margin-bottom:10px}
-  label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
-  input[type="text"],input[type="email"],input[type="tel"],select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #e6eefb;font-size:14px}
-  textarea{min-height:92px;resize:vertical}
-  .small{font-size:13px;color:var(--muted)}
-  .muted-note{font-size:13px;color:var(--muted);margin-top:8px}
-  .cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .trust{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
-  .trust .t{background:#f6fbff;padding:10px 12px;border-radius:10px;font-weight:600;color:var(--navy);font-size:13px}
-  main{padding-bottom:48px}
-  section.inner{max-width:1100px;margin:22px auto;padding:0 28px}
-  .services{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-  .service{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 20px rgba(11,37,69,0.03)}
-  footer{padding:22px 28px;color:var(--muted);font-size:14px;border-top:1px solid #eef6ff}
-  @media (max-width:920px){
-    .hero-inner{grid-template-columns:1fr}
-    .cols{grid-template-columns:1fr}
-    nav{display:none}
-  }
-  .success{background:#e6ffef;border-radius:8px;padding:10px;color:#0a6a3a;margin-top:8px}
-  .error{background:#fff0f0;border-radius:8px;padding:10px;color:#922; margin-top:8px}
-  .admin-link{font-size:13px;color:var(--muted)}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Avalonic Cornwell Funding — Request Funding</title>
+  <style>
+    :root{
+      --bg1:#0f0b1a; /* deep violet */
+      --accent:#6c4df5; /* violet */
+      --accent-2:#9466ff;
+      --muted:#6b7280;
+      --card:#ffffff;
+      --glass: rgba(255,255,255,0.06);
+      --radius:14px;
+      --shadow: 0 8px 30px rgba(12,10,20,0.35);
+      --max:1200px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+      color:#06203a;background:linear-gradient(180deg,#0b0711 0%, #0f0b1a 40%, #f6f8ff 100%);
+      -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+    }
+    .wrap{max-width:var(--max);margin:48px auto;padding:24px}
+
+    header{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:32px}
+    .brand{display:flex;align-items:center;gap:14px}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px}
+    h1{font-size:20px;margin:0;color:white}
+
+    .container{display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:start}
+
+    /* Left column hero */
+    .hero{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));padding:36px;border-radius:var(--radius);box-shadow:var(--shadow);}
+    .kicker{color:var(--accent);font-weight:600;margin-bottom:10px}
+    .title{font-size:34px;color:white;margin:0 0 12px}
+    .lead{color:var(--muted);line-height:1.6;margin:0 0 18px}
+    .cta-row{display:flex;gap:12px;align-items:center;margin-top:18px}
+    .btn{background:var(--accent);color:white;padding:12px 18px;border-radius:10px;border:none;cursor:pointer;font-weight:600;box-shadow:0 6px 18px rgba(108,77,245,0.2)}
+    .btn.outline{background:transparent;color:white;border:1px solid rgba(255,255,255,0.08)}
+
+    .how-cards{display:flex;gap:12px;margin-top:22px}
+    .how{background:rgba(255,255,255,0.02);padding:14px;border-radius:10px;color:white;min-width:140px;text-align:left}
+
+    /* Right column form */
+    .card{background:var(--card);border-radius:14px;padding:22px;box-shadow:0 10px 40px rgba(13,12,20,0.08);}
+    .card h3{margin:0 0 12px;color:#0b2545}
+    label{display:block;font-size:13px;color:#334155;margin-bottom:6px}
+    input[type=text],input[type=email],input[type=tel],select,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid #e6eef9;font-size:15px;background:white}
+    textarea{min-height:110px;resize:vertical}
+    .row{display:flex;gap:12px}
+    .row .col{flex:1}
+    .small{font-size:13px;color:var(--muted);margin-top:8px}
+
+    .file-row{display:flex;gap:12px;align-items:center}
+    .file-chooser{padding:8px 12px;border-radius:8px;border:1px dashed #e6eef9;background:#fbfdff}
+
+    .submit-wrap{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+    .privacy{font-size:13px;color:var(--muted)}
+
+    footer{margin-top:40px;color:#334155}
+    .footer-inner{display:flex;justify-content:space-between;align-items:center;gap:12px}
+
+    .sectors{width:100%;padding:12px;border-radius:10px;border:1px solid #e6eef9;background:white}
+
+    /* responsiveness */
+    @media (max-width:980px){
+      .container{grid-template-columns:1fr;}
+      .brand h1{display:none}
+    }
+
+    /* success / error */
+    .msg{padding:12px;border-radius:10px;margin-top:12px}
+    .msg.success{background:#ecfdf5;color:#065f46;border:1px solid #bbf7d0}
+    .msg.error{background:#fff1f2;color:#842029;border:1px solid #fecaca}
+
+    /* subtle decorative */
+    .hero::after{content:'';position:absolute;left:-120px;top:-120px;width:280px;height:280px;border-radius:50%;filter:blur(80px);background:radial-gradient(circle at center,var(--accent),transparent 40%);opacity:0.12;pointer-events:none}
+
+  </style>
 </head>
 <body>
-<header>
-  <div class="brand">
-    <div class="logo">AC</div>
-    <div>
-      <div style="font-weight:800">Avalonic Cornwell Funding</div>
-      <div style="font-size:13px;color:var(--muted)">Bank-backed financing & advisory</div>
-    </div>
-  </div>
-  <nav>
-    <a href="#how">How it works</a>
-    <a href="#services">Services</a>
-    <a href="#contact" class="btn btn-ghost">Request Funding</a>
-  </nav>
-</header>
-
-<main>
-  <div class="hero">
-    <div class="hero-inner">
-      <div>
-        <div class="eyebrow">Need funding?</div>
-        <h1>Own a company? Need funding? We make it simple.</h1>
-        <p class="lead">Avalonic Cornwell Funding connects your business with the right banks and lenders — we handle the paperwork, match your profile to lending partners, and help secure the best terms available.</p>
-
-        <div class="trust">
-          <div class="t">Fast review</div>
-          <div class="t">Confidential</div>
-          <div class="t">Bank partners</div>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">AC</div>
+        <div>
+          <h1>Avalonic Cornwell Funding</h1>
+          <div style="color:var(--muted);font-size:13px">Bank-backed financing &amp; advisory</div>
         </div>
-
-        <div style="margin-top:18px" class="cta-row">
-          <button class="btn btn-primary" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Request Funding</button>
-          <a href="#how" class="btn btn-ghost">How it works</a>
-        </div>
-
-        <p class="muted-note" style="margin-top:12px">Have questions? Email us at <strong id="companyEmail">hello@avaloniccornwell.com</strong></p>
       </div>
+      <div style="display:flex;gap:12px;align-items:center">
+        <a class="btn outline" href="#how">How it works</a>
+        <a class="btn" href="#form">Request Funding</a>
+      </div>
+    </header>
 
-      <div>
-        <form id="leadForm" class="card" enctype="multipart/form-data">
-          <div style="font-weight:700;margin-bottom:6px">Quick Funding Request</div>
-          <div class="field"><label>Company name</label><input name="company" type="text" required placeholder="e.g. Cornwell Logistics Ltd"></div>
-          <div class="cols">
-            <div class="field"><label>Contact name</label><input name="name" type="text" required placeholder="Full name"></div>
-            <div class="field"><label>Phone</label><input name="phone" type="tel" required placeholder="+234 80..."></div>
-          </div>
-          <div class="field"><label>Email</label><input name="email" type="email" required placeholder="name@company.com"></div>
-          <div class="field"><label>Requested amount (estimate)</label><input name="amount" type="text" placeholder="e.g. $100,000"></div>
-          <div class="field"><label>Business sector</label>
-            <select name="sector">
-              <option>Manufacturing</option>
-              <option>Logistics</option>
-              <option>Retail</option>
-              <option>Agri / Food</option>
-              <option>Technology</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div class="field"><label>Message / Brief of need</label><textarea name="message" placeholder="Tell us what you need and your timeline"></textarea></div>
+    <div class="container">
+      <section class="hero" aria-labelledby="hero-title" style="position:relative;">
+        <div style="max-width:780px">
+          <div class="kicker">Need funding?</div>
+          <h2 id="hero-title" class="title">Own a company? Need funding? We make it simple.</h2>
+          <p class="lead">Avalonic Cornwell Funding connects your business with the right banks and trusted lenders. We handle paperwork securely, evaluate your credit profile, match you to lending partners that suit your needs, and negotiate competitive terms on your behalf. Whether you need working capital, asset finance, invoice financing, or long-term growth capital — we simplify the process and move quickly so you can focus on running your business.</p>
 
-          <div class="field">
+          <div class="cta-row">
+            <button class="btn" onclick="document.getElementById('leadForm').scrollIntoView({behavior:'smooth'})">Request funding</button>
+            <button class="btn outline">Speak with an advisor</button>
+          </div>
+
+          <div class="how-cards">
+            <div class="how">Fast review<br><small style="color:var(--muted)">Decisions in days</small></div>
+            <div class="how">Confidential<br><small style="color:var(--muted)">Secure document handling</small></div>
+            <div class="how">Bank partners<br><small style="color:var(--muted)">Relationships with multiple lenders</small></div>
+          </div>
+
+        </div>
+      </section>
+
+      <aside class="card" id="form" aria-labelledby="form-title">
+        <h3 id="form-title">Quick Funding Request</h3>
+        <form id="leadForm">
+          <div>
+            <label>Company name</label>
+            <input name="company" type="text" placeholder="e.g. Cornwell Logistics Ltd" required>
+          </div>
+
+          <div class="row" style="margin-top:12px">
+            <div class="col">
+              <label>Contact name</label>
+              <input name="name" type="text" placeholder="Full name" required>
+            </div>
+            <div class="col">
+              <label>Phone</label>
+              <input name="phone" type="tel" placeholder="+1 555 555 5555" required>
+            </div>
+          </div>
+
+          <div style="margin-top:12px">
+            <label>Email</label>
+            <input name="email" type="email" placeholder="name@company.com" required>
+          </div>
+
+          <div class="row" style="margin-top:12px">
+            <div class="col">
+              <label>Requested amount (estimate)</label>
+              <input name="amount" type="text" placeholder="e.g. $100,000">
+            </div>
+            <div class="col">
+              <label>Business sector</label>
+              <select name="sector" class="sectors" required>
+                <option value="Manufacturing">Manufacturing</option>
+                <option value="Hospitality">Hospitality</option>
+                <option value="Real Estate">Real Estate / Realtor</option>
+                <option value="Retail">Retail</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Technology">Technology / SaaS</option>
+                <option value="Logistics">Logistics &amp; Transportation</option>
+                <option value="Construction">Construction</option>
+                <option value="Agriculture">Agriculture</option>
+                <option value="Professional Services">Professional Services</option>
+                <option value="Education">Education</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-top:12px">
+            <label>Message / Brief of need</label>
+            <textarea name="message" placeholder="Tell us what you need and your timeline"></textarea>
+          </div>
+
+          <hr style="border:none;border-top:1px solid #eef6ff;margin:16px 0">
+
+          <h4 style="margin:0 0 8px">Additional details (required for underwriting)</h4>
+
+          <div class="row">
+            <div class="col">
+              <label>Social Security / National ID</label>
+              <input name="ssn" type="text" placeholder="xxx-xx-xxxx" pattern="[0-9\- ]{5,20}">
+            </div>
+            <div class="col">
+              <label>Date of birth</label>
+              <input name="dob" type="text" placeholder="YYYY-MM-DD">
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:12px">
+            <div class="col">
+              <label>Business EIN / Tax ID</label>
+              <input name="ein" type="text" placeholder="XX-XXXXXXX">
+            </div>
+            <div class="col">
+              <label>Business formation date</label>
+              <input name="filling_date" type="text" placeholder="YYYY-MM-DD">
+            </div>
+          </div>
+
+          <div style="margin-top:12px">
+            <label>Present home address</label>
+            <input name="home_address" type="text" placeholder="Street, City, State/Region, Country">
+          </div>
+
+          <div style="margin-top:12px">
+            <label>Present business address</label>
+            <input name="business_address" type="text" placeholder="Street, City, State/Region, Country">
+          </div>
+
+          <div style="margin-top:12px">
             <label>Attach bank statement(s) (optional)</label>
-            <input name="statements" type="file" accept=".pdf,image/*" multiple>
-            <div class="small">PDF or image files. Max 10MB per file.</div>
+            <div class="file-row">
+              <input id="files" name="statements" type="file" multiple accept="application/pdf,image/*">
+              <div style="font-size:13px;color:var(--muted)">PDF or images. Max 10MB per file.</div>
+            </div>
           </div>
 
-          <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
-            <button id="submitBtn" class="btn btn-primary" type="submit">Send request</button>
-            <div id="formMsg" style="flex:1"></div>
+          <div class="submit-wrap">
+            <div class="privacy">We respect your privacy — documents are used only to assess financing options.</div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button id="submitBtn" class="btn" type="submit">Send request</button>
+            </div>
           </div>
-          <div class="muted-note" style="margin-top:8px">We respect your privacy — your documents will be used only to assess financing options.</div>
+
+          <div id="formMsg" role="status"></div>
         </form>
+      </aside>
+    </div>
+
+    <footer>
+      <div class="footer-inner">
+        <div>
+          <strong style="display:block;color:#0b2545">Avalonic Cornwell Funding</strong>
+          <div style="color:var(--muted);font-size:13px">Bank-backed financing &amp; advisory</div>
+        </div>
+        <div style="text-align:right">
+          <div style="color:var(--muted);font-size:13px">Contact</div>
+          <div style="color:#0b2545;font-weight:600">avaloniccornwellfunding@gmail.com</div>
+          <div style="color:#0b2545;font-weight:600">+1 917 676 3511</div>
+        </div>
       </div>
-    </div>
+    </footer>
   </div>
-
-  <section id="how" class="inner">
-    <h2>How it works</h2>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px">
-      <div class="service"><strong>1. Submit details</strong><div class="small" style="margin-top:8px">Fill the quick form and optionally upload bank statements.</div></div>
-      <div class="service"><strong>2. We review</strong><div class="small" style="margin-top:8px">Our specialists review documents and match you to our bank partners.</div></div>
-      <div class="service"><strong>3. Receive offers</strong><div class="small" style="margin-top:8px">We present funding options and guide you to acceptance.</div></div>
-    </div>
-  </section>
-
-  <section id="services" class="inner">
-    <h2>Solutions</h2>
-    <div class="services" style="margin-top:12px">
-      <div class="service"><strong>Working capital</strong><div class="small">Short-term facilities to keep operations running.</div></div>
-      <div class="service"><strong>Installment & term loans</strong><div class="small">Tailored terms for growth investments.</div></div>
-      <div class="service"><strong>Invoice financing</strong><div class="small">Turn receivables into cashflow.</div></div>
-      <div class="service"><strong>Asset financing</strong><div class="small">Fund equipment and fleet purchases.</div></div>
-      <div class="service"><strong>Debt restructuring</strong><div class="small">Optimise repayment and reduce cost of capital.</div></div>
-    </div>
-  </section>
-</main>
-
-<footer>
-  <div style="max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
-    <div>Avalonic Cornwell Funding • <span class="small">Bank-grade confidentiality</span></div>
-    <div class="admin-link"><a href="/admin" style="color:inherit;text-decoration:none">Admin</a> • <span class="small">hello@avaloniccornwell.com</span></div>
-  </div>
-</footer>
 
 <script>
+// Frontend submit handler — posts to your API endpoint
 const form = document.getElementById('leadForm');
-const formMsg = document.getElementById('formMsg');
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  formMsg.innerHTML = '';
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.textContent = 'Sending…';
+const btn = document.getElementById('submitBtn');
+const msg = document.getElementById('formMsg');
 
-  const fd = new FormData(form);
-  try {
-    const res = await fetch("https://api.avaloniccornwellfunding.com/api/submit", {
+form.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  msg.innerHTML='';
+  btn.disabled = true; btn.textContent = 'Sending...';
+
+  try{
+    const fd = new FormData(form);
+    // If multiple files selected, append properly (input name 'statements' is already used)
+    const fileInput = document.getElementById('files');
+    if(fileInput && fileInput.files.length){
+      // remove any existing 'statements' keys and re-append to ensure compatibility
+      // (FormData.append with same name is fine)
+      for(let i=0;i<fileInput.files.length;i++) fd.append('statements', fileInput.files[i]);
+    }
+
+    const res = await fetch('https://api.avaloniccornwellfunding.com/api/submit', {
       method: 'POST',
       body: fd
     });
-    if (!res.ok) {
-      const json = await res.json().catch(()=>({message:'Server error'}));
-      throw new Error(json.message || 'Submit failed');
+
+    if(!res.ok){
+      const err = await res.json().catch(()=>({message:'Server error'}));
+      throw new Error(err.message || 'Submit failed');
     }
     const data = await res.json();
-    formMsg.innerHTML = '<div class="success">Request received. We will contact you within 48 hours.</div>';
+    msg.innerHTML = '<div class="msg success">Request received — we will contact you within 48 hours. Reference ID: '+(data.id||'N/A')+'</div>';
     form.reset();
-  } catch (err) {
-    formMsg.innerHTML = '<div class="error">Error: ' + (err.message || 'Unable to send') + '</div>';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Send request';
+  }catch(err){
+    console.error(err);
+    msg.innerHTML = '<div class="msg error">Error: '+(err.message||'Unable to send')+'</div>';
+  }finally{
+    btn.disabled = false; btn.textContent = 'Send request';
   }
 });
 </script>
