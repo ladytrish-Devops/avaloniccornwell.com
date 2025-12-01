@@ -6,19 +6,20 @@ const fs = require('fs');
 const path = require('path');
 const basicAuth = require('basic-auth');
 const cors = require('cors');
-const crypto = require('crypto');
 
 const app = express();
-app.use(cors());
+
+// --- Middleware ---
+app.use(cors()); // enable CORS (adjust in production if needed)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Directories + files
+// --- Paths ---
 const UPLOAD_DIR = path.join(__dirname, 'uploads');
 const LEADS_FILE = path.join(__dirname, 'leads.json');
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
-// Multer storage (disk)
+// --- Multer storage and limits ---
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, UPLOAD_DIR),
   filename: (req, file, cb) => {
@@ -27,12 +28,13 @@ const storage = multer.diskStorage({
     cb(null, `${ts}_${safe}`);
   }
 });
+
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 } // 10 MB per file
+  limits: { fileSize: 10 * 1024 * 1024, files: 5 } // 10MB per file, up to 5 files
 });
 
-// Simple JSON leads read/save
+// --- Simple leads persistence ---
 function readLeads() {
   try {
     if (!fs.existsSync(LEADS_FILE)) return [];
@@ -44,41 +46,21 @@ function readLeads() {
   }
 }
 function saveLead(lead) {
-  const arr = readLeads();
-  arr.unshift(lead);
-  fs.writeFileSync(LEADS_FILE, JSON.stringify(arr, null, 2));
-}
-
-// Optional encryption helper (AES-256-GCM)
-const ENCRYPT_KEY = process.env.ENCRYPT_KEY || ''; // must be 32 bytes for AES-256
-function encryptText(text) {
-  if (!ENCRYPT_KEY || ENCRYPT_KEY.length !== 32) return null;
   try {
-    const iv = crypto.randomBytes(12);
-    const cipher = crypto.createCipheriv('aes-256-gcm', Buffer.from(ENCRYPT_KEY, 'utf8'), iv);
-    const encrypted = Buffer.concat([cipher.update(String(text), 'utf8'), cipher.final()]);
-    const tag = cipher.getAuthTag();
-    // store iv:tag:encrypted as base64
-    return Buffer.concat([iv, tag, encrypted]).toString('base64');
+    const arr = readLeads();
+    arr.unshift(lead);
+    fs.writeFileSync(LEADS_FILE, JSON.stringify(arr, null, 2));
   } catch (e) {
-    console.error('encryptText error', e);
-    return null;
+    console.error('saveLead error', e);
   }
 }
-function maskSSN(ssn) {
-  if (!ssn) return '';
-  // return last 4 visible, mask rest
-  const digits = String(ssn).replace(/\D/g, '');
-  if (digits.length <= 4) return '****' + digits;
-  return '***-**-' + digits.slice(-4);
-}
 
-// Helper escape
+// --- Helpers ---
 function escapeHtml(str = '') {
   return ('' + str).replace(/[&<>"']/g, s => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s]));
 }
 
-// Require basic auth for admin routes
+// Basic auth for admin endpoints
 function requireAuth(req, res, next) {
   const user = basicAuth(req);
   const adminUser = process.env.ADMIN_USER || 'admin';
@@ -90,13 +72,15 @@ function requireAuth(req, res, next) {
   next();
 }
 
-// Public: health check
+// --- Public endpoints ---
 app.get('/health', (req, res) => res.json({ ok: true }));
 
-// POST /api/submit - receives form + optional files
-app.post('/api/submit', upload.array('statements', 5), (req, res) => {
+// Accept form submissions with optional files (any field name)
+// NOTE: frontend should POST multipart/form-data (FormData).
+app.post('/api/submit', upload.any(), (req, res) => {
   try {
     const body = req.body || {};
+    // map files to relative paths for admin links
     const files = (req.files || []).map(f => ({
       path: path.join('uploads', path.basename(f.path)).replace(/\\/g, '/'),
       originalname: f.originalname,
@@ -104,44 +88,22 @@ app.post('/api/submit', upload.array('statements', 5), (req, res) => {
       size: f.size
     }));
 
-    // Sensitive fields handling
-    const ssnRaw = body.ssn || ''; // expecting name="ssn" in form
-    let ssnMasked = ssnRaw ? maskSSN(ssnRaw) : '';
-    let ssnEncrypted = null;
-    if (ssnRaw) {
-      const encrypted = encryptText(ssnRaw);
-      if (encrypted) {
-        ssnEncrypted = encrypted;
-      } else {
-        console.warn('ENCRYPT_KEY not set or invalid - storing only masked SSN (not secure).');
-      }
-    }
-
-    // other fields (these are plain, non-sensitive)
     const lead = {
       id: Date.now(),
       receivedAt: new Date().toISOString(),
       company: body.company || '',
-      contactName: body.name || '',
+      contactName: body.name || body.contactName || '',
       phone: body.phone || '',
       email: body.email || '',
       amount: body.amount || '',
       sector: body.sector || '',
       message: body.message || '',
-      // New fields:
-      ssnMasked,
-      ssnEncrypted, // encrypted value or null
-      dob: body.dob || '',
-      ein: body.ein || '',
-      formationDate: body.formationDate || '',
-      homeAddress: body.homeAddress || '',
-      businessAddress: body.businessAddress || '',
       files
     };
 
     saveLead(lead);
 
-    // Optional email notify (nodemailer) — only if SMTP config present
+    // Optional email notification if SMTP set up
     if (process.env.NOTIFY_EMAIL && process.env.SMTP_HOST) {
       try {
         const nodemailer = require('nodemailer');
@@ -156,9 +118,11 @@ app.post('/api/submit', upload.array('statements', 5), (req, res) => {
                 pass: process.env.SMTP_PASS
               } : undefined
             });
+
             const to = process.env.NOTIFY_EMAIL;
             const subject = `New funding request: ${lead.company || lead.contactName || 'Unknown'}`;
             const text = `New lead received:\n\nCompany: ${lead.company}\nContact: ${lead.contactName}\nEmail: ${lead.email}\nPhone: ${lead.phone}\nAmount: ${lead.amount}\n\nMessage:\n${lead.message}\n\nFiles:\n${files.map(f => f.originalname).join(', ')}`;
+
             await transporter.sendMail({
               from: process.env.SMTP_FROM || process.env.NOTIFY_EMAIL,
               to,
@@ -170,7 +134,7 @@ app.post('/api/submit', upload.array('statements', 5), (req, res) => {
           }
         })();
       } catch (e) {
-        console.error('nodemailer not installed or error', e);
+        console.error('nodemailer missing or error', e);
       }
     }
 
@@ -181,29 +145,29 @@ app.post('/api/submit', upload.array('statements', 5), (req, res) => {
   }
 });
 
-// Serve uploaded files publicly (NOTE: secure this in production)
+// Serve uploaded files publicly (be careful in production)
 app.use('/uploads', express.static(UPLOAD_DIR));
 
-// Admin: simple HTML page listing leads (protected)
+// --- Admin views (protected) ---
 app.get('/admin', requireAuth, (req, res) => {
   const leads = readLeads();
   let html = `<!doctype html><html><head><meta charset="utf-8"><title>Avalonic Admin</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>body{font-family:Arial,Helvetica,sans-serif;color:#0b2545;padding:18px}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #eee;text-align:left}th{background:#f6fbff}a.file{display:inline-block;margin-right:6px;padding:4px;border:1px solid #eef6ff;border-radius:6px;text-decoration:none;color:#0b2545}</style>
-  </head><body><h1>Avalonic Cornwell Funding — Admin</h1><p>Total leads: ${leads.length}</p><table><thead><tr><th>Date</th><th>Company</th><th>Contact</th><th>Email</th><th>Phone</th><th>Amount</th><th>SSN (masked)</th><th>DOB</th><th>EIN</th><th>Home address</th><th>Business address</th><th>Files</th></tr></thead><tbody>`;
+  </head><body><h1>Avalonic Cornwell Funding — Admin</h1><p>Total leads: ${leads.length}</p><table><thead><tr><th>Date</th><th>Company</th><th>Contact</th><th>Email</th><th>Phone</th><th>Amount</th><th>Files</th></tr></thead><tbody>`;
   for (const l of leads) {
     const filesHtml = (l.files || []).map(f => `<a class="file" href="/${escapeHtml(f.path)}" target="_blank">${escapeHtml(f.originalname)}</a>`).join(' ');
-    html += `<tr><td>${escapeHtml(new Date(l.receivedAt).toLocaleString())}</td><td>${escapeHtml(l.company)}</td><td>${escapeHtml(l.contactName)}</td><td>${escapeHtml(l.email)}</td><td>${escapeHtml(l.phone)}</td><td>${escapeHtml(l.amount)}</td><td>${escapeHtml(l.ssnMasked || '')}</td><td>${escapeHtml(l.dob || '')}</td><td>${escapeHtml(l.ein || '')}</td><td>${escapeHtml(l.homeAddress || '')}</td><td>${escapeHtml(l.businessAddress || '')}</td><td>${filesHtml}</td></tr>`;
+    html += `<tr><td>${escapeHtml(new Date(l.receivedAt).toLocaleString())}</td><td>${escapeHtml(l.company)}</td><td>${escapeHtml(l.contactName)}</td><td>${escapeHtml(l.email)}</td><td>${escapeHtml(l.phone)}</td><td>${escapeHtml(l.amount)}</td><td>${filesHtml}</td></tr>`;
   }
   html += `</tbody></table></body></html>`;
   res.send(html);
 });
 
-// Optional: endpoint to get JSON of leads (protected)
 app.get('/api/leads', requireAuth, (req, res) => {
   const leads = readLeads();
   res.json({ ok: true, total: leads.length, leads });
 });
 
+// --- Start server ---
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, ()=>console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
