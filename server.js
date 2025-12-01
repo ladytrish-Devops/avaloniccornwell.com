@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const basicAuth = require('basic-auth');
 const cors = require('cors');
+const crypto = require('crypto');
 
 const app = express();
 app.use(cors());
@@ -48,6 +49,30 @@ function saveLead(lead) {
   fs.writeFileSync(LEADS_FILE, JSON.stringify(arr, null, 2));
 }
 
+// Optional encryption helper (AES-256-GCM)
+const ENCRYPT_KEY = process.env.ENCRYPT_KEY || ''; // must be 32 bytes for AES-256
+function encryptText(text) {
+  if (!ENCRYPT_KEY || ENCRYPT_KEY.length !== 32) return null;
+  try {
+    const iv = crypto.randomBytes(12);
+    const cipher = crypto.createCipheriv('aes-256-gcm', Buffer.from(ENCRYPT_KEY, 'utf8'), iv);
+    const encrypted = Buffer.concat([cipher.update(String(text), 'utf8'), cipher.final()]);
+    const tag = cipher.getAuthTag();
+    // store iv:tag:encrypted as base64
+    return Buffer.concat([iv, tag, encrypted]).toString('base64');
+  } catch (e) {
+    console.error('encryptText error', e);
+    return null;
+  }
+}
+function maskSSN(ssn) {
+  if (!ssn) return '';
+  // return last 4 visible, mask rest
+  const digits = String(ssn).replace(/\D/g, '');
+  if (digits.length <= 4) return '****' + digits;
+  return '***-**-' + digits.slice(-4);
+}
+
 // Helper escape
 function escapeHtml(str = '') {
   return ('' + str).replace(/[&<>"']/g, s => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s]));
@@ -79,6 +104,20 @@ app.post('/api/submit', upload.array('statements', 5), (req, res) => {
       size: f.size
     }));
 
+    // Sensitive fields handling
+    const ssnRaw = body.ssn || ''; // expecting name="ssn" in form
+    let ssnMasked = ssnRaw ? maskSSN(ssnRaw) : '';
+    let ssnEncrypted = null;
+    if (ssnRaw) {
+      const encrypted = encryptText(ssnRaw);
+      if (encrypted) {
+        ssnEncrypted = encrypted;
+      } else {
+        console.warn('ENCRYPT_KEY not set or invalid - storing only masked SSN (not secure).');
+      }
+    }
+
+    // other fields (these are plain, non-sensitive)
     const lead = {
       id: Date.now(),
       receivedAt: new Date().toISOString(),
@@ -89,6 +128,14 @@ app.post('/api/submit', upload.array('statements', 5), (req, res) => {
       amount: body.amount || '',
       sector: body.sector || '',
       message: body.message || '',
+      // New fields:
+      ssnMasked,
+      ssnEncrypted, // encrypted value or null
+      dob: body.dob || '',
+      ein: body.ein || '',
+      formationDate: body.formationDate || '',
+      homeAddress: body.homeAddress || '',
+      businessAddress: body.businessAddress || '',
       files
     };
 
@@ -143,10 +190,10 @@ app.get('/admin', requireAuth, (req, res) => {
   let html = `<!doctype html><html><head><meta charset="utf-8"><title>Avalonic Admin</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>body{font-family:Arial,Helvetica,sans-serif;color:#0b2545;padding:18px}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #eee;text-align:left}th{background:#f6fbff}a.file{display:inline-block;margin-right:6px;padding:4px;border:1px solid #eef6ff;border-radius:6px;text-decoration:none;color:#0b2545}</style>
-  </head><body><h1>Avalonic Cornwell Funding — Admin</h1><p>Total leads: ${leads.length}</p><table><thead><tr><th>Date</th><th>Company</th><th>Contact</th><th>Email</th><th>Phone</th><th>Amount</th><th>Files</th></tr></thead><tbody>`;
+  </head><body><h1>Avalonic Cornwell Funding — Admin</h1><p>Total leads: ${leads.length}</p><table><thead><tr><th>Date</th><th>Company</th><th>Contact</th><th>Email</th><th>Phone</th><th>Amount</th><th>SSN (masked)</th><th>DOB</th><th>EIN</th><th>Home address</th><th>Business address</th><th>Files</th></tr></thead><tbody>`;
   for (const l of leads) {
     const filesHtml = (l.files || []).map(f => `<a class="file" href="/${escapeHtml(f.path)}" target="_blank">${escapeHtml(f.originalname)}</a>`).join(' ');
-    html += `<tr><td>${escapeHtml(new Date(l.receivedAt).toLocaleString())}</td><td>${escapeHtml(l.company)}</td><td>${escapeHtml(l.contactName)}</td><td>${escapeHtml(l.email)}</td><td>${escapeHtml(l.phone)}</td><td>${escapeHtml(l.amount)}</td><td>${filesHtml}</td></tr>`;
+    html += `<tr><td>${escapeHtml(new Date(l.receivedAt).toLocaleString())}</td><td>${escapeHtml(l.company)}</td><td>${escapeHtml(l.contactName)}</td><td>${escapeHtml(l.email)}</td><td>${escapeHtml(l.phone)}</td><td>${escapeHtml(l.amount)}</td><td>${escapeHtml(l.ssnMasked || '')}</td><td>${escapeHtml(l.dob || '')}</td><td>${escapeHtml(l.ein || '')}</td><td>${escapeHtml(l.homeAddress || '')}</td><td>${escapeHtml(l.businessAddress || '')}</td><td>${filesHtml}</td></tr>`;
   }
   html += `</tbody></table></body></html>`;
   res.send(html);
@@ -158,9 +205,5 @@ app.get('/api/leads', requireAuth, (req, res) => {
   res.json({ ok: true, total: leads.length, leads });
 });
 
-// small helper used above
-function escapeHtml(s=''){ return (''+s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, ()=>console.log(`Server running on port ${PORT}`));
-app.get('/health',(req,res)=>res.json({ok:true}));
